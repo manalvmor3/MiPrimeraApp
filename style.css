@@ -1,0 +1,356 @@
+/* Estilos generales de la página */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: linear-gradient(135deg, #74ebd5, #acb6e5);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* antes estaba center */
+    min-height: 100vh;
+  }
+  
+  /* Contenedor principal de la app */
+  .app-container {
+    background-color: #ffffff;
+    padding: 24px 28px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 420px;
+    margin-top: 96px; /* nueva línea para bajar la tarjeta */
+  }
+  
+  /* Título */
+  .app-container h1 {
+    margin-top: 0;
+    margin-bottom: 18px;
+    font-size: 24px;
+    text-align: center;
+    color: #333333;
+  }
+  
+  /* Sección de entrada (input + botón) */
+  .input-section {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  
+  /* Caja de texto */
+  #task-input {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #cccccc;
+    font-size: 14px;
+  }
+
+  /* Input que aparece al editar una tarea */
+.task-edit-input {
+    flex: 1;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid #cccccc;
+    font-size: 14px;
+    background-color: #ffffff;
+  }
+  
+  /* Botón Añadir */
+  #add-button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    background-color: #4caf50;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  #add-button:hover {
+    background-color: #43a047;
+  }
+  
+  /* Lista de tareas */
+  #task-list {
+    list-style: none; /* Quita los puntos de la lista */
+    margin: 0;
+    padding: 0;
+  }
+  
+/* Cada tarea (cada <li>) */
+.task-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #f7f7f7;
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+    cursor: grab; /* Indica que se puede arrastrar */
+  }
+
+  /* Mientras se arrastra una tarea */
+  .task-item.dragging {
+    opacity: 0.6;
+  }
+  
+/* Marcador (hueco) donde se mostrará la posición futura */
+.task-placeholder {
+    background-color: transparent;
+    border: 2px dashed #90caf9;
+    height: 40px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+  }
+
+  body.dark-mode .task-placeholder {
+    border-color: #ffeb3b;
+  }
+
+  /* Texto de la tarea */
+  .task-text {
+    flex: 1;
+    margin-right: 8px;
+    font-size: 14px;
+    color: #333333;
+  }
+  
+  /* Tarea completada (tachada y gris) */
+  .task-text.completed {
+    text-decoration: line-through;
+    color: #888888;
+  }
+  
+  /* Botón eliminar */
+  .delete-button {
+    background-color: #e53935;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .delete-button:hover {
+    background-color: #c62828;
+  }
+  
+  /* Cursor tipo "mano" al pasar por encima de la tarea */
+  .task-text {
+    cursor: pointer;
+  }
+
+
+  /* ===== MODO OSCURO ===== */
+
+/* Cuando el body tiene la clase .dark-mode */
+body.dark-mode {
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  }
+  
+  body.dark-mode .app-container {
+    background-color: #1e1e1e;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+  }
+  
+  body.dark-mode .app-container h1 {
+    color: #f5f5f5;
+  }
+  
+  body.dark-mode #task-input {
+    background-color: #2a2a2a;
+    color: #f5f5f5;
+    border-color: #555555;
+  }
+
+  /* En modo oscuro, el input de edición sigue el estilo general */
+  body.dark-mode .task-edit-input {
+    background-color: #2a2a2a;
+    color: #f5f5f5;
+    border-color: #555555;
+  }
+  
+  body.dark-mode #add-button {
+    background-color: #1976d2;
+  }
+  
+  body.dark-mode #add-button:hover {
+    background-color: #1565c0;
+  }
+  
+  body.dark-mode .task-item {
+    background-color: #2a2a2a;
+  }
+
+  body.dark-mode .task-item.dragging {
+    opacity: 0.6;
+  }
+  
+  body.dark-mode .task-text {
+    color: #f5f5f5;
+  }
+  
+  body.dark-mode .task-text.completed {
+    color: #9e9e9e;
+  }
+  
+  body.dark-mode .delete-button {
+    background-color: #d32f2f;
+  }
+  
+  body.dark-mode .delete-button:hover {
+    background-color: #b71c1c;
+  }
+  
+  body.dark-mode #theme-toggle-button {
+    background-color: #333333;
+    color: #f5f5f5;
+    border-color: #555555;
+  }
+  
+  body.dark-mode #theme-toggle-button:hover {
+    background-color: #444444;
+  }
+
+  /* Barra superior en modo oscuro */
+body.dark-mode .page-top-bar {
+    background: rgba(0, 0, 0, 0.7);
+  }
+  
+  /* Interruptor en modo oscuro: fondo más oscuro */
+  body.dark-mode .theme-toggle {
+    background-color: #424242;
+  }
+  
+  /* Knob desplazado a la derecha y con color tipo "sol" */
+  body.dark-mode .theme-toggle-knob {
+    transform: translateX(24px);
+    background-color: #ffeb3b;
+  }
+
+  /* Etiquetas en modo oscuro */
+  body.dark-mode .theme-label {
+    color: #f5f5f5;
+  }
+  /* En modo oscuro, "Claro" se ve más suave y "Oscuro" resalta más */
+  body.dark-mode .theme-label-light {
+    opacity: 0.5;
+  }
+  body.dark-mode .theme-label-dark {
+    opacity: 1;
+  }
+
+  /* ===== BARRA SUPERIOR CON INTERRUPTOR DE TEMA ===== */
+
+.page-top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    z-index: 10;
+  }
+
+  .theme-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  /* Texto "Claro" / "Oscuro" */
+  .theme-label {
+    font-size: 13px;
+    color: #333333;
+    user-select: none;
+  }
+  .theme-label-dark {
+    opacity: 0.5; /* En modo claro, "Oscuro" se ve más suave */
+  }
+  
+  /* Píldora del interruptor (fondo) */
+  .theme-toggle {
+    width: 52px;
+    height: 28px;
+    border-radius: 999px;
+    border: none;
+    padding: 3px;
+    background-color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+  }
+  
+  /* Círculo que se mueve */
+  .theme-toggle-knob {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transform: translateX(0);
+    transition: transform 0.25s ease, background-color 0.25s ease;
+  }
+
+
+  /* ===== BARRA DE FILTROS ===== */
+  .filter-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .filter-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #cccccc;
+    border-radius: 8px;
+    background-color: #f5f5f5;
+    color: #555555;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .filter-btn:hover {
+    background-color: #eeeeee;
+  }
+
+  .filter-btn.active {
+    background-color: #4caf50;
+    border-color: #4caf50;
+    color: white;
+  }
+
+  /* Ocultar tareas según el filtro activo (el placeholder no se oculta) */
+  #task-list.filter-pending .task-item.task-item--completed:not(.task-placeholder) {
+    display: none;
+  }
+
+  #task-list.filter-completed .task-item:not(.task-item--completed):not(.task-placeholder) {
+    display: none;
+  }
+
+  /* Filtros en modo oscuro */
+  body.dark-mode .filter-btn {
+    background-color: #2a2a2a;
+    border-color: #555555;
+    color: #e0e0e0;
+  }
+  body.dark-mode .filter-btn:hover {
+    background-color: #333333;
+  }
+  body.dark-mode .filter-btn.active {
+    background-color: #1976d2;
+    border-color: #1976d2;
+    color: white;
+  }
