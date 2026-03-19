@@ -5,6 +5,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const addButton = document.getElementById("add-button");
     const taskList = document.getElementById("task-list");
     const themeToggleButton = document.getElementById("theme-toggle-button");
+    const tareasView = document.getElementById("tareas-view");
+    const notasView = document.getElementById("notas-view");
+    const subNavButtons = document.querySelectorAll(".sub-nav-btn");
+    const noteTitleInput = document.getElementById("note-title");
+    const noteContentInput = document.getElementById("note-content");
+    const saveNoteButton = document.getElementById("save-note-button");
+    const notesGrid = document.getElementById("notes-grid");
 
     let draggedItem = null; // Guardará la tarea que estamos arrastrando
     let dragPlaceholder = null; // Hueco visual donde se mostrará la posición
@@ -18,6 +25,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Clave para guardar el filtro activo (all, pending, completed)
     const FILTER_STORAGE_KEY = "mi_filtro_tareas";
+
+    // Clave para guardar las notas
+    const NOTES_STORAGE_KEY = "mis_notas";
   
     // 5. Función para guardar las tareas actuales en localStorage
     function saveTasksToLocalStorage() {
@@ -66,6 +76,71 @@ document.addEventListener("DOMContentLoaded", function () {
       } else if (filter === "completed") {
         btn.textContent = "Completadas (" + completedCount + ")";
       }
+    });
+  }
+
+  // ===== LÓGICA DE NOTAS =====
+
+  function loadNotesFromLocalStorage() {
+    const saved = localStorage.getItem(NOTES_STORAGE_KEY);
+    if (!saved) {
+      return [];
+    }
+    try {
+      const parsed = JSON.parse(saved);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveNotesToLocalStorage(notes) {
+    localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notes));
+  }
+
+  function createNoteCard(note, notesGrid, notes, onChange) {
+    const card = document.createElement("div");
+    card.classList.add("note-card");
+
+    const titleEl = document.createElement("div");
+    titleEl.classList.add("note-title");
+    titleEl.textContent = note.title || "Sin título";
+
+    const contentEl = document.createElement("div");
+    contentEl.classList.add("note-content");
+    contentEl.textContent = note.content || "";
+
+    const actionsEl = document.createElement("div");
+    actionsEl.classList.add("note-actions");
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.classList.add("note-delete-button");
+    deleteBtn.textContent = "Eliminar";
+
+    deleteBtn.addEventListener("click", function () {
+      const index = notes.findIndex(function (n) { return n.id === note.id; });
+      if (index !== -1) {
+        notes.splice(index, 1);
+        saveNotesToLocalStorage(notes);
+        onChange();
+      }
+    });
+
+    actionsEl.appendChild(deleteBtn);
+
+    card.appendChild(titleEl);
+    card.appendChild(contentEl);
+    card.appendChild(actionsEl);
+
+    notesGrid.appendChild(card);
+  }
+
+  function renderNotes(notesGrid, notes) {
+    notesGrid.innerHTML = "";
+    notes.forEach(function (note) {
+      createNoteCard(note, notesGrid, notes, function () {
+        renderNotes(notesGrid, notes);
+      });
     });
   }
 
@@ -335,6 +410,25 @@ document.addEventListener("DOMContentLoaded", function () {
       localStorage.setItem(FILTER_STORAGE_KEY, filterValue);
     }
 
+    // Mostrar una vista ("tareas" o "notas") y actualizar el botón activo
+    function showView(viewName) {
+      if (viewName === "tareas") {
+        tareasView.classList.remove("hidden");
+        notasView.classList.add("hidden");
+      } else if (viewName === "notas") {
+        tareasView.classList.add("hidden");
+        notasView.classList.remove("hidden");
+      }
+
+      subNavButtons.forEach(function (btn) {
+        if (btn.getAttribute("data-tab") === viewName) {
+          btn.classList.add("active");
+        } else {
+          btn.classList.remove("active");
+        }
+      });
+    }
+
       // Soltar (drop) dentro de la lista: colocamos la tarea donde está el marcador
   taskList.addEventListener("drop", function (event) {
     event.preventDefault();
@@ -397,11 +491,57 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
 
+    // Navegación entre pestañas (Tareas / Notas)
+    subNavButtons.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        const tab = btn.getAttribute("data-tab"); // "tareas" o "notas"
+        showView(tab);
+      });
+    });
+
+// ===== LÓGICA DE EVENTOS DE NOTAS =====
+
+    // A) Cargar las notas que ya existan en la memoria al abrir la app
+    let misNotas = loadNotesFromLocalStorage();
+    renderNotes(notesGrid, misNotas);
+
+    // B) Qué pasa cuando pulsamos el botón "Añadir nota"
+    saveNoteButton.addEventListener("click", function () {
+      const title = noteTitleInput.value.trim();
+      const content = noteContentInput.value.trim();
+
+      // Si no hay contenido, avisamos al usuario y paramos
+      if (content === "") {
+        alert("¡El contenido de la nota no puede estar vacío!");
+        return;
+      }
+
+      // Creamos un "molde" (objeto) con los datos de la nota nueva
+      const newNote = {
+        id: Date.now().toString(), // Creamos un ID único usando la fecha actual
+        title: title,
+        content: content
+      };
+
+      // Añadimos la nota al array de notas
+      misNotas.push(newNote);
+
+      // Guardamos en localStorage y redibujamos la cuadrícula
+      saveNotesToLocalStorage(misNotas);
+      renderNotes(notesGrid, misNotas);
+
+      // Vaciamos las cajas de texto para poder escribir otra
+      noteTitleInput.value = "";
+      noteContentInput.value = "";
+      noteTitleInput.focus(); // Ponemos el cursor de nuevo en el título
+    });
+
     // 15. Cargar tareas y tema guardados al abrir la página
     loadTasksFromLocalStorage();
     loadThemeFromLocalStorage();
     updatePendingCounter();
-
+    showView("tareas"); // Mostrar la vista "tareas" por defecto al cargar la página
+    
     // Aplicar el filtro guardado (o "all" por defecto)
     const savedFilter = localStorage.getItem(FILTER_STORAGE_KEY);
     if (savedFilter === "all" || savedFilter === "pending" || savedFilter === "completed") {

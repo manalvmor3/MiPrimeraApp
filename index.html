@@ -55,7 +55,26 @@
         </ul>
       </div>
 
-      <div id="notas-view">
+      <div id="notas-view" class="hidden">
+        <h1>Notas</h1>
+
+        <div class="notes-inputs">
+          <input
+            id="note-title"
+            type="text"
+            placeholder="Título de la nota"
+          />
+          <textarea
+            id="note-content"
+            rows="4"
+            placeholder="Escribe aquí el contenido de la nota..."
+          ></textarea>
+          <button id="save-note-button" type="button">Añadir nota</button>
+        </div>
+
+        <div id="notes-grid" class="notes-grid">
+          <!-- Aquí se mostrarán las notas guardadas -->
+        </div>
       </div>
     </div>
 

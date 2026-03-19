@@ -10,6 +10,10 @@ body {
     min-height: 100vh;
   }
 
+  .hidden {
+    display: none;
+  }
+
   /* Barra de navegación (SPA: Tareas / Notas) */
   .sub-nav {
     position: fixed;
@@ -58,11 +62,6 @@ body {
     max-width: 420px;
     margin-top: 140px; /* deja espacio para top-bar + sub-nav */
   }
-
-  /* Vistas SPA */
-  #notas-view {
-    display: none; /* por defecto oculto */
-  }
   
   /* Título */
   .app-container h1 {
@@ -78,6 +77,97 @@ body {
     display: flex;
     gap: 8px;
     margin-bottom: 18px;
+  }
+
+  /* ===== VISTA DE NOTAS ===== */
+
+  .notes-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  #note-title {
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #cccccc;
+    font-size: 14px;
+  }
+
+  #note-content {
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #cccccc;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  #save-note-button {
+    align-self: flex-end;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: none;
+    background-color: #ffb300;
+    color: #333333;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  #save-note-button:hover {
+    background-color: #ffa000;
+  }
+
+  .notes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+
+  .note-card {
+    background-color: #fff9c4;
+    border-radius: 10px;
+    padding: 10px 12px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    word-wrap: break-word;
+  }
+
+  .note-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #424242;
+  }
+
+  .note-content {
+    font-size: 13px;
+    color: #555555;
+    white-space: pre-wrap;
+  }
+
+  .note-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+  }
+
+  .note-delete-button {
+    border: none;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 12px;
+    background-color: #e53935;
+    color: white;
+    cursor: pointer;
+  }
+
+  .note-delete-button:hover {
+    background-color: #c62828;
   }
   
   /* Caja de texto */
@@ -235,6 +325,35 @@ body.dark-mode {
     background-color: #2a2a2a;
     color: #f5f5f5;
     border-color: #555555;
+  }
+
+  /* Notas en modo oscuro */
+  body.dark-mode #note-title,
+  body.dark-mode #note-content {
+    background-color: #2a2a2a;
+    color: #f5f5f5;
+    border-color: #555555;
+  }
+
+  body.dark-mode #save-note-button {
+    background-color: #ffca28;
+    color: #333333;
+  }
+
+  body.dark-mode #save-note-button:hover {
+    background-color: #ffc107;
+  }
+
+  body.dark-mode .note-card {
+    background-color: #fff59d;
+  }
+
+  body.dark-mode .note-title {
+    color: #333333;
+  }
+
+  body.dark-mode .note-content {
+    color: #424242;
   }
   
   body.dark-mode #add-button {
