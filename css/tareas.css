@@ -1,72 +1,122 @@
 /* ===== VISTA DE TAREAS ===== */
+
+/* Contenedor del campo de entrada y botón de añadir */
 .input-section {
-    display: flex; gap: 8px; margin-bottom: 18px;
-  }
-  
-  #task-input {
-    flex: 1; padding: 10px 12px; border-radius: 8px;
-    border: 1px solid #cccccc; font-size: 14px;
-  }
-  
-  #add-button {
-    padding: 10px 16px; border: none; border-radius: 8px;
-    background-color: #4caf50; color: white; font-size: 14px; cursor: pointer;
-    transition: background-color 0.2s ease;
-  }
-  
-  #add-button:hover { background-color: #43a047; }
-  
-  /* Filtros */
-  .filter-bar { display: flex; gap: 6px; margin-bottom: 16px; }
-  .filter-btn {
-    flex: 1; padding: 8px 12px; border: 1px solid #cccccc; border-radius: 8px;
-    background-color: #f5f5f5; color: #555555; font-size: 13px; cursor: pointer;
-    transition: all 0.2s ease;
-  }
-  .filter-btn:hover { background-color: #eeeeee; }
-  .filter-btn.active { background-color: #4caf50; border-color: #4caf50; color: white; }
-  
-  /* Lista de tareas */
-  #task-list { list-style: none; margin: 0; padding: 0; }
-  .task-item {
-    display: flex; align-items: center; justify-content: space-between;
-    background-color: #f7f7f7; border-radius: 8px; padding: 8px 10px; margin-bottom: 8px;
-    cursor: grab;
-  }
-  .task-item.dragging { opacity: 0.6; }
-  .task-placeholder {
-    background-color: transparent; border: 2px dashed #90caf9;
-    height: 40px; margin-bottom: 8px; border-radius: 8px;
-  }
-  
-  .task-text { flex: 1; margin-right: 8px; font-size: 14px; color: #333333; cursor: pointer; }
-  .task-text.completed { text-decoration: line-through; color: #888888; }
-  .task-edit-input {
-    flex: 1; padding: 6px 8px; border-radius: 6px; border: 1px solid #cccccc;
-    font-size: 14px; background-color: #ffffff;
-  }
-  
-  .delete-button {
-    background-color: #e53935; color: white; border: none; border-radius: 6px;
-    padding: 6px 10px; font-size: 12px; cursor: pointer; transition: background-color 0.2s ease;
-  }
-  .delete-button:hover { background-color: #c62828; }
-  
-  /* Ocultar tareas según filtro */
-  #task-list.filter-pending .task-item.task-item--completed:not(.task-placeholder) { display: none; }
-  #task-list.filter-completed .task-item:not(.task-item--completed):not(.task-placeholder) { display: none; }
-  
-  /* ===== MODO OSCURO (Tareas) ===== */
-  body.dark-mode #task-input { background-color: #2a2a2a; color: #f5f5f5; border-color: #555555; }
-  body.dark-mode #add-button { background-color: #1976d2; }
-  body.dark-mode #add-button:hover { background-color: #1565c0; }
-  body.dark-mode .filter-btn { background-color: #2a2a2a; border-color: #555555; color: #e0e0e0; }
-  body.dark-mode .filter-btn:hover { background-color: #333333; }
-  body.dark-mode .filter-btn.active { background-color: #1976d2; border-color: #1976d2; color: white; }
-  body.dark-mode .task-item { background-color: #2a2a2a; }
-  body.dark-mode .task-placeholder { border-color: #ffeb3b; }
-  body.dark-mode .task-text { color: #f5f5f5; }
-  body.dark-mode .task-text.completed { color: #9e9e9e; }
-  body.dark-mode .task-edit-input { background-color: #2a2a2a; color: #f5f5f5; border-color: #555555; }
-  body.dark-mode .delete-button { background-color: #d32f2f; }
-  body.dark-mode .delete-button:hover { background-color: #b71c1c; }
+  display: flex; 
+  gap: 8px; 
+  margin-bottom: 18px;
+}
+
+/* Caja de texto para escribir nuevas tareas */
+#task-input {
+  flex: 1; 
+  padding: 10px 12px; 
+  border-radius: 8px;
+  border: 1px solid #cccccc; 
+  font-size: 14px;
+}
+
+/* Botón para confirmar la creación de una tarea */
+#add-button {
+  padding: 10px 16px; 
+  border: none; 
+  border-radius: 8px;
+  background-color: #4caf50; 
+  color: white; 
+  font-size: 14px; 
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+#add-button:hover { background-color: #43a047; }
+
+/* Barra de filtros (Todas, Pendientes, Completadas) */
+.filter-bar { display: flex; gap: 6px; margin-bottom: 16px; }
+
+.filter-btn {
+  flex: 1; 
+  padding: 8px 12px; 
+  border: 1px solid #cccccc; 
+  border-radius: 8px;
+  background-color: #f5f5f5; 
+  color: #555555; 
+  font-size: 13px; 
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.filter-btn:hover { background-color: #eeeeee; }
+
+/* Estado activo del filtro (botón resaltado) */
+.filter-btn.active { 
+  background-color: #4caf50; 
+  border-color: #4caf50; 
+  color: white; 
+}
+
+/* Lista de tareas: Quitamos las viñetas por defecto (list-style: none) */
+#task-list { list-style: none; margin: 0; padding: 0; }
+
+/* Estilo base de cada elemento de tarea */
+.task-item {
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between;
+  background-color: #f7f7f7; 
+  border-radius: 8px; 
+  padding: 8px 10px; 
+  margin-bottom: 8px;
+  cursor: grab; /* Indica visualmente que se puede arrastrar */
+}
+
+/* Efecto visual al arrastrar una tarea: la hacemos un poco transparente */
+.task-item.dragging { opacity: 0.6; }
+
+/* Marcador (Placeholder): El hueco punteado que aparece al arrastrar para indicar dónde se soltará */
+.task-placeholder {
+  background-color: transparent; 
+  border: 2px dashed #90caf9;
+  height: 40px; 
+  margin-bottom: 8px; 
+  border-radius: 8px;
+}
+
+/* Texto de la tarea */
+.task-text { flex: 1; margin-right: 8px; font-size: 14px; color: #333333; cursor: pointer; }
+
+/* Tarea completada: añadimos tachado */
+.task-text.completed { text-decoration: line-through; color: #888888; }
+
+/* Input temporal que aparece al hacer doble clic para editar */
+.task-edit-input {
+  flex: 1; padding: 6px 8px; border-radius: 6px; border: 1px solid #cccccc;
+  font-size: 14px; background-color: #ffffff;
+}
+
+/* Botón de eliminar tarea */
+.delete-button {
+  background-color: #e53935; color: white; border: none; border-radius: 6px;
+  padding: 6px 10px; font-size: 12px; cursor: pointer; transition: background-color 0.2s ease;
+}
+.delete-button:hover { background-color: #c62828; }
+
+/* Lógica de filtrado: Ocultamos elementos usando selectores CSS avanzados 
+   según la clase que JavaScript añade al padre (#task-list) */
+#task-list.filter-pending .task-item.task-item--completed:not(.task-placeholder) { display: none; }
+#task-list.filter-completed .task-item:not(.task-item--completed):not(.task-placeholder) { display: none; }
+
+/* ===== MODO OSCURO (Tareas) ===== */
+/* Reajuste de colores para que el modo oscuro sea cómodo a la vista */
+body.dark-mode #task-input { background-color: #2a2a2a; color: #f5f5f5; border-color: #555555; }
+body.dark-mode #add-button { background-color: #1976d2; }
+body.dark-mode #add-button:hover { background-color: #1565c0; }
+
+body.dark-mode .filter-btn { background-color: #2a2a2a; border-color: #555555; color: #e0e0e0; }
+body.dark-mode .filter-btn:hover { background-color: #333333; }
+body.dark-mode .filter-btn.active { background-color: #1976d2; border-color: #1976d2; color: white; }
+
+body.dark-mode .task-item { background-color: #2a2a2a; }
+body.dark-mode .task-placeholder { border-color: #ffeb3b; }
+body.dark-mode .task-text { color: #f5f5f5; }
+body.dark-mode .task-text.completed { color: #9e9e9e; }
+body.dark-mode .task-edit-input { background-color: #2a2a2a; color: #f5f5f5; border-color: #555555; }
+body.dark-mode .delete-button { background-color: #d32f2f; }
+body.dark-mode .delete-button:hover { background-color: #b71c1c; }

@@ -1,51 +1,99 @@
 /* ===== VISTA DE NOTAS ===== */
+
+/* Contenedor de los campos de entrada (título y texto) */
 .notes-inputs {
-    display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px;
-  }
-  
-  #note-title {
-    padding: 8px 10px; border-radius: 8px; border: 1px solid #cccccc; font-size: 14px;
-  }
-  
-  #note-content {
-    padding: 8px 10px; border-radius: 8px; border: 1px solid #cccccc; font-size: 14px;
-    resize: vertical; min-height: 80px;
-  }
-  
-  #save-note-button {
-    align-self: flex-end; padding: 8px 14px; border-radius: 8px; border: none;
-    background-color: #ffb300; color: #333333; font-weight: 600; font-size: 13px;
-    cursor: pointer; transition: background-color 0.2s ease;
-  }
-  
-  #save-note-button:hover { background-color: #ffa000; }
-  
-  .notes-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px;
-  }
-  
-  .note-card {
-    background-color: #fff9c4; border-radius: 10px; padding: 10px 12px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
-    display: flex; flex-direction: column; gap: 6px; word-wrap: break-word;
-  }
-  
-  .note-title { font-weight: 600; font-size: 14px; color: #424242; }
-  .note-content { font-size: 13px; color: #555555; white-space: pre-wrap; }
-  .note-actions { display: flex; justify-content: flex-end; margin-top: 4px; }
-  .note-delete-button {
-    border: none; border-radius: 6px; padding: 4px 8px; font-size: 12px;
-    background-color: #e53935; color: white; cursor: pointer;
-  }
-  .note-delete-button:hover { background-color: #c62828; }
-  
-  /* ===== MODO OSCURO (Notas) ===== */
-  body.dark-mode #note-title,
-  body.dark-mode #note-content {
-    background-color: #2a2a2a; color: #f5f5f5; border-color: #555555;
-  }
-  body.dark-mode #save-note-button { background-color: #ffca28; color: #333333; }
-  body.dark-mode #save-note-button:hover { background-color: #ffc107; }
-  body.dark-mode .note-card { background-color: #fff59d; }
-  body.dark-mode .note-title { color: #333333; }
-  body.dark-mode .note-content { color: #424242; }
+  display: flex; 
+  flex-direction: column; /* Apilamos los elementos verticalmente */
+  gap: 10px; 
+  margin-bottom: 18px;
+}
+
+/* Input para el título de la nota */
+#note-title {
+  padding: 8px 10px; 
+  border-radius: 8px; 
+  border: 1px solid #cccccc; 
+  font-size: 14px;
+}
+
+/* Área de texto para el cuerpo de la nota */
+#note-content {
+  padding: 8px 10px; 
+  border-radius: 8px; 
+  border: 1px solid #cccccc; 
+  font-size: 14px;
+  resize: vertical;      /* Permitimos al usuario cambiar la altura */
+  min-height: 80px;      /* Altura mínima para que no sea un cuadradito diminuto */
+}
+
+/* Botón para guardar la nota */
+#save-note-button {
+  align-self: flex-end; /* Alineamos el botón a la derecha del contenedor */
+  padding: 8px 14px; 
+  border-radius: 8px; 
+  border: none;
+  background-color: #ffb300; /* Color amarillo tipo "post-it" */
+  color: #333333; 
+  font-weight: 600; 
+  font-size: 13px;
+  cursor: pointer; 
+  transition: background-color 0.2s ease;
+}
+
+#save-note-button:hover { background-color: #ffa000; }
+
+/* Cuadrícula (Grid) para organizar las notas visualmente */
+.notes-grid {
+  display: grid; 
+  /* Esta línea es mágica: crea tantas columnas como quepan (min 140px), 
+     llenando el espacio disponible automáticamente */
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
+  gap: 12px;
+}
+
+/* Tarjeta individual de la nota (el post-it) */
+.note-card {
+  background-color: #fff9c4; /* Fondo amarillo claro */
+  border-radius: 10px; 
+  padding: 10px 12px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15); /* Sombra suave para dar efecto relieve */
+  display: flex; 
+  flex-direction: column; 
+  gap: 6px; 
+  word-wrap: break-word; /* Evita que palabras muy largas rompan el diseño */
+}
+
+.note-title { font-weight: 600; font-size: 14px; color: #424242; }
+.note-content { font-size: 13px; color: #555555; white-space: pre-wrap; } /* Mantiene los saltos de línea escritos */
+
+.note-actions { 
+  display: flex; 
+  justify-content: flex-end; /* Botón de eliminar a la derecha */
+  margin-top: 4px; 
+}
+
+/* Botón de eliminar dentro de la tarjeta */
+.note-delete-button {
+  border: none; 
+  border-radius: 6px; 
+  padding: 4px 8px; 
+  font-size: 12px;
+  background-color: #e53935; /* Rojo de peligro */
+  color: white; 
+  cursor: pointer;
+}
+.note-delete-button:hover { background-color: #c62828; }
+
+/* ===== MODO OSCURO (Notas) ===== */
+/* Ajustamos los colores para que no deslumbren en modo oscuro */
+body.dark-mode #note-title,
+body.dark-mode #note-content {
+  background-color: #2a2a2a; color: #f5f5f5; border-color: #555555;
+}
+body.dark-mode #save-note-button { background-color: #ffca28; color: #333333; }
+body.dark-mode #save-note-button:hover { background-color: #ffc107; }
+
+/* Tarjeta en modo oscuro: un poco más tenue para no contrastar demasiado */
+body.dark-mode .note-card { background-color: #fff59d; }
+body.dark-mode .note-title { color: #333333; }
+body.dark-mode .note-content { color: #424242; }
