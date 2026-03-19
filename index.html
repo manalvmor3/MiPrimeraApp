@@ -3,26 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <title>Mi Lista de Tareas</title>
-  <link rel="stylesheet" href="style.css" />
+  <!-- Aquí enlazamos nuestros CSS separados -->
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/tareas.css" />
+  <link rel="stylesheet" href="css/notas.css" />
 </head>
 <body>
     <div class="page-top-bar">
         <div class="theme-toggle-wrapper">
-          <span class="theme-label theme-label-light">
-            ☀️ Claro
-          </span>
-    
-          <button
-            id="theme-toggle-button"
-            class="theme-toggle"
-            aria-label="Cambiar entre modo claro y modo oscuro"
-          >
+          <span class="theme-label theme-label-light">☀️ Claro</span>
+          <button id="theme-toggle-button" class="theme-toggle" aria-label="Cambiar entre modo claro y modo oscuro">
             <span class="theme-toggle-knob"></span>
           </button>
-    
-          <span class="theme-label theme-label-dark">
-            🌙 Oscuro
-          </span>
+          <span class="theme-label theme-label-dark">🌙 Oscuro</span>
         </div>
       </div>
 
@@ -32,52 +25,40 @@
     </nav>
 
     <div class="app-container">
+      <!-- VISTA DE TAREAS -->
       <div id="tareas-view">
         <h1>Lista de Tareas</h1>
-
         <div class="input-section">
-          <input
-            id="task-input"
-            type="text"
-            placeholder="Escribe una tarea y pulsa Enter o el botón Añadir..."
-          />
+          <input id="task-input" type="text" placeholder="Escribe una tarea y pulsa Enter o el botón Añadir..." />
           <button id="add-button">Añadir</button>
         </div>
-
         <div class="filter-bar">
           <button type="button" class="filter-btn active" data-filter="all">Todas</button>
           <button type="button" class="filter-btn" data-filter="pending">Pendientes</button>
           <button type="button" class="filter-btn" data-filter="completed">Completadas</button>
         </div>
-
         <ul id="task-list">
           <!-- Aquí se irán agregando las tareas -->
         </ul>
       </div>
 
+      <!-- VISTA DE NOTAS -->
       <div id="notas-view" class="hidden">
         <h1>Notas</h1>
-
         <div class="notes-inputs">
-          <input
-            id="note-title"
-            type="text"
-            placeholder="Título de la nota"
-          />
-          <textarea
-            id="note-content"
-            rows="4"
-            placeholder="Escribe aquí el contenido de la nota..."
-          ></textarea>
+          <input id="note-title" type="text" placeholder="Título de la nota" />
+          <textarea id="note-content" rows="4" placeholder="Escribe aquí el contenido de la nota..."></textarea>
           <button id="save-note-button" type="button">Añadir nota</button>
         </div>
-
         <div id="notes-grid" class="notes-grid">
           <!-- Aquí se mostrarán las notas guardadas -->
         </div>
       </div>
     </div>
 
-  <script src="script.js"></script>
+  <!-- Aquí enlazamos nuestros JS separados -->
+  <script src="js/app.js"></script>
+  <script src="js/tareas.js"></script>
+  <script src="js/notas.js"></script>
 </body>
 </html>
