@@ -26,28 +26,38 @@
         </div>
       </div>
 
+    <nav class="sub-nav" aria-label="Navegación principal">
+      <button type="button" class="sub-nav-btn active" data-tab="tareas">Tareas</button>
+      <button type="button" class="sub-nav-btn" data-tab="notas">Notas</button>
+    </nav>
+
     <div class="app-container">
+      <div id="tareas-view">
         <h1>Lista de Tareas</h1>
 
-    <div class="input-section">
-        <input
+        <div class="input-section">
+          <input
             id="task-input"
             type="text"
             placeholder="Escribe una tarea y pulsa Enter o el botón Añadir..."
-        />
-        <button id="add-button">Añadir</button>
-    </div>
+          />
+          <button id="add-button">Añadir</button>
+        </div>
 
-    <div class="filter-bar">
-      <button type="button" class="filter-btn active" data-filter="all">Todas</button>
-      <button type="button" class="filter-btn" data-filter="pending">Pendientes</button>
-      <button type="button" class="filter-btn" data-filter="completed">Completadas</button>
-    </div>
+        <div class="filter-bar">
+          <button type="button" class="filter-btn active" data-filter="all">Todas</button>
+          <button type="button" class="filter-btn" data-filter="pending">Pendientes</button>
+          <button type="button" class="filter-btn" data-filter="completed">Completadas</button>
+        </div>
 
-    <ul id="task-list">
-      <!-- Aquí se irán agregando las tareas -->
-    </ul>
-  </div>
+        <ul id="task-list">
+          <!-- Aquí se irán agregando las tareas -->
+        </ul>
+      </div>
+
+      <div id="notas-view">
+      </div>
+    </div>
 
   <script src="script.js"></script>
 </body>
