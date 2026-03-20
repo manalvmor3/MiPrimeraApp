@@ -1,0 +1,113 @@
+/* ===== ESTILOS DE AUTENTICACIÓN (LOGIN/REGISTRO) ===== */
+
+.auth-container {
+    background-color: #ffffff;
+    padding: 32px 28px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 380px;
+    margin-top: 140px;
+    text-align: center;
+  }
+  
+  .auth-form h1 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    font-size: 26px;
+    color: #333333;
+  }
+  
+  .auth-subtitle {
+    font-size: 14px;
+    color: #666666;
+    margin-bottom: 24px;
+  }
+  
+  .auth-form input {
+    width: 100%;
+    box-sizing: border-box; /* Para que el padding no desborde el ancho */
+    padding: 12px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    border: 1px solid #cccccc;
+    font-size: 14px;
+  }
+  
+  .auth-submit-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background-color: #1976d2;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .auth-submit-btn:hover {
+    background-color: #1565c0;
+  }
+  
+  .auth-switch-text {
+    margin-top: 20px;
+    font-size: 13px;
+    color: #555555;
+  }
+  
+  .auth-switch-text a {
+    color: #1976d2;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .auth-switch-text a:hover {
+    text-decoration: underline;
+  }
+
+  /* Botón de cerrar sesión en la barra superior */
+  .logout-btn {
+    margin-right: auto; /* Empuja el botón a la izquierda y el tema a la derecha */
+    padding: 6px 12px;
+    border: 1px solid #e53935;
+    background-color: transparent;
+    color: #e53935;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s ease;
+  }
+
+  .logout-btn:hover {
+    background-color: #e53935;
+    color: white;
+  }
+  
+  /* ===== MODO OSCURO (Auth) ===== */
+  body.dark-mode .auth-container {
+    background-color: #1e1e1e;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+  }
+  
+  body.dark-mode .auth-form h1 { color: #f5f5f5; }
+  body.dark-mode .auth-subtitle { color: #aaaaaa; }
+  body.dark-mode .auth-switch-text { color: #cccccc; }
+  body.dark-mode .auth-switch-text a { color: #64b5f6; }
+  
+  body.dark-mode .auth-form input {
+    background-color: #2a2a2a;
+    color: #f5f5f5;
+    border-color: #555555;
+  }
+
+  body.dark-mode .logout-btn {
+    border-color: #ef5350;
+    color: #ef5350;
+  }
+  body.dark-mode .logout-btn:hover {
+    background-color: #ef5350;
+    color: white;
+  }

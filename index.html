@@ -8,6 +8,7 @@
        El orden aquí es importante: los estilos específicos (tareas/notas) 
        tienen más peso si se cargan después de los base. -->
   <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/auth.css" /> <!-- NUEVO: Estilos del login -->
   <link rel="stylesheet" href="css/tareas.css" />
   <link rel="stylesheet" href="css/notas.css" />
 </head>
@@ -16,6 +17,8 @@
     <!-- Barra superior fija: Contiene el interruptor de modo claro/oscuro.
          Usamos un contenedor con botones para el switch del tema. -->
     <div class="page-top-bar">
+      <!-- NUEVO: Botón de cerrar sesión (oculto por defecto) -->
+      <button id="logout-button" class="logout-btn hidden">Cerrar sesión</button>
         <div class="theme-toggle-wrapper">
           <span class="theme-label theme-label-light">☀️ Claro</span>
           <button id="theme-toggle-button" class="theme-toggle" aria-label="Cambiar entre modo claro y modo oscuro">
@@ -25,15 +28,48 @@
         </div>
     </div>
 
-    <!-- Navegación principal: Aquí gestionamos la lógica de "pestañas" (SPA).
-         Los atributos 'data-tab' son claves: JS los usa para saber qué vista mostrar. -->
-    <nav class="sub-nav" aria-label="Navegación principal">
+     <!-- NUEVO: VISTA DE AUTENTICACIÓN (Login / Registro) -->
+     <div id="auth-view" class="auth-container">
+      
+      <!-- Formulario de Iniciar Sesión -->
+      <form id="login-form" class="auth-form">
+        <h1>Iniciar Sesión</h1>
+        <p class="auth-subtitle">Accede a tus tareas y notas en la nube</p>
+        
+        <input type="email" id="login-email" placeholder="Correo electrónico" required />
+        <input type="password" id="login-password" placeholder="Contraseña" required />
+        
+        <button type="submit" class="auth-submit-btn">Entrar</button>
+        
+        <p class="auth-switch-text">
+          ¿No tienes cuenta? <a href="#" id="show-register">Regístrate aquí</a>
+        </p>
+      </form>
+
+      <!-- Formulario de Registro (Oculto por defecto) -->
+      <form id="register-form" class="auth-form hidden">
+        <h1>Crear Cuenta</h1>
+        <p class="auth-subtitle">Únete para no perder nunca tus datos</p>
+        
+        <input type="email" id="register-email" placeholder="Correo electrónico" required />
+        <input type="password" id="register-password" placeholder="Contraseña (mín. 6 caracteres)" required minlength="6"/>
+        
+        <button type="submit" class="auth-submit-btn">Registrarme</button>
+        
+        <p class="auth-switch-text">
+          ¿Ya tienes cuenta? <a href="#" id="show-login">Inicia sesión</a>
+        </p>
+      </form>
+    </div>
+
+    <!-- MENÚ SPA (Ahora oculto por defecto con la clase 'hidden') -->
+    <nav id="main-nav" class="sub-nav hidden" aria-label="Navegación principal">
       <button type="button" class="sub-nav-btn active" data-tab="tareas">Tareas</button>
       <button type="button" class="sub-nav-btn" data-tab="notas">Notas</button>
     </nav>
 
-    <!-- Contenedor principal: Mantiene el ancho y centrado de la app -->
-    <div class="app-container">
+      <!-- APP PRINCIPAL (Ahora oculta por defecto con la clase 'hidden' y un ID nuevo) -->
+      <div id="main-app-view" class="app-container hidden">
       
       <!-- VISTA DE TAREAS: Esta sección se muestra por defecto.
            Contiene el input de texto, el botón de añadir y los botones de filtro. -->
@@ -76,6 +112,7 @@
 
   <!-- Scripts: Cargamos los archivos JS al final para asegurar que 
        el navegador ya ha dibujado todo el HTML antes de empezar a manipularlo. -->
+  <script src="js/auth.js"></script> <!-- NUEVO: Lógica del login -->
   <script src="js/app.js"></script>    <!-- Lógica de navegación y temas -->
   <script src="js/tareas.js"></script> <!-- Lógica exclusiva de tareas -->
   <script src="js/notas.js"></script>  <!-- Lógica exclusiva de notas -->

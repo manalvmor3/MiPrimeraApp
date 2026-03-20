@@ -16,7 +16,7 @@ body {
 
 /* Clase auxiliar para ocultar elementos rápidamente (usada para la navegación SPA) */
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 /* Contenedor principal: La "tarjeta" blanca donde vive la app */
