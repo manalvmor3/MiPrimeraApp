@@ -1,103 +1,94 @@
-// tareas.js - Lógica exclusiva de Tareas
+// tareas.js - Lógica exclusiva de Tareas CONECTADA A FIRESTORE
+
+// NUEVO: Importamos las herramientas de Firestore
+import { 
+  collection, 
+  addDoc, 
+  query, 
+  where, 
+  getDocs, 
+  deleteDoc, 
+  doc, 
+  updateDoc,
+  orderBy // Para ordenar las tareas
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
 document.addEventListener("DOMContentLoaded", function () {
-  // Referencias a los elementos del DOM de la vista de tareas
+  // 1. Selección de elementos del DOM
   const taskInput = document.getElementById("task-input");
   const addButton = document.getElementById("add-button");
   const taskList = document.getElementById("task-list");
   const filterButtons = document.querySelectorAll(".filter-btn");
 
-  // Constantes de almacenamiento local
-  const STORAGE_KEY = "mi_lista_tareas";
-  const FILTER_STORAGE_KEY = "mi_filtro_tareas";
+  let usuarioActualId = null; // Guardará el DNI del usuario logueado
 
-  // Variables para controlar el arrastrar y soltar
+  // --- Funcionalidad del Drag & Drop (esto no cambia) ---
   let draggedItem = null;
   let dragPlaceholder = null;
   let dragInitialIndex = null;
+  
+  // --- NUEVO: FUNCIONES DE FIRESTORE ---
 
-  // Función para serializar y guardar las tareas en LocalStorage
-  function saveTasks() {
-    const tasks = [];
-    taskList.querySelectorAll(".task-item").forEach(item => {
-      const textSpan = item.querySelector(".task-text");
-      tasks.push({
-        text: textSpan.textContent,
-        completed: textSpan.classList.contains("completed"),
-      });
-    });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-  }
+  // 2. Cargar tareas desde la nube, ordenadas por su timestamp
+  async function loadTasksFromFirestore() {
+    if (!usuarioActualId) return;
 
-  // Función para refrescar los contadores en los botones de filtro
-  function updateFilterCounts() {
-    const items = taskList.querySelectorAll(".task-item:not(.task-placeholder)");
-    let pendingCount = 0, completedCount = 0;
+    taskList.innerHTML = "";
+    const q = query(collection(window.db, "tareas"), where("userId", "==", usuarioActualId), orderBy("createdAt"));
     
-    items.forEach(item => {
-      if (item.classList.contains("task-item--completed")) completedCount++;
-      else pendingCount++;
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      createTaskElement({ id: doc.id, ...doc.data() });
     });
 
-    filterButtons.forEach(btn => {
-      const filter = btn.getAttribute("data-filter");
-      if (filter === "all") btn.textContent = "Todas (" + items.length + ")";
-      else if (filter === "pending") btn.textContent = "Pendientes (" + pendingCount + ")";
-      else if (filter === "completed") btn.textContent = "Completadas (" + completedCount + ")";
-    });
+    updateFilterCounts();
   }
 
-  // Cambia la clase CSS del padre para filtrar visualmente las tareas
-  function applyFilter(filterValue) {
-    taskList.classList.remove("filter-all", "filter-pending", "filter-completed");
-    taskList.classList.add("filter-" + filterValue);
-    filterButtons.forEach(btn => {
-      if (btn.getAttribute("data-filter") === filterValue) btn.classList.add("active");
-      else btn.classList.remove("active");
-    });
-    localStorage.setItem(FILTER_STORAGE_KEY, filterValue);
-  }
-
-  // Crea dinámicamente un elemento de lista (li) para cada tarea
-  function createTaskElement(text, completed) {
+  // 3. Crear una tarea (li) a partir de los datos de la nube
+  function createTaskElement(task) {
     const listItem = document.createElement("li");
     listItem.classList.add("task-item");
-    if (completed) listItem.classList.add("task-item--completed");
+    listItem.dataset.id = task.id; // Guardamos el ID de la nube en el elemento
+
+    if (task.completed) listItem.classList.add("task-item--completed");
     listItem.draggable = true;
 
     const taskTextSpan = document.createElement("span");
-    taskTextSpan.textContent = text;
+    taskTextSpan.textContent = task.text;
     taskTextSpan.classList.add("task-text");
-    if (completed) taskTextSpan.classList.add("completed");
+    if (task.completed) taskTextSpan.classList.add("completed");
 
-    // Evento: Clic para marcar/desmarcar tarea
-    taskTextSpan.addEventListener("click", function () {
-      taskTextSpan.classList.toggle("completed");
-      listItem.classList.toggle("task-item--completed");
-      saveTasks();
-      updateFilterCounts();
+    // NUEVO: Clic para completar/descompletar (actualiza en la nube)
+    taskTextSpan.addEventListener("click", async function () {
+      const newCompletedState = !listItem.classList.contains("task-item--completed");
+      const taskDocRef = doc(window.db, "tareas", task.id);
+      await updateDoc(taskDocRef, { completed: newCompletedState });
+      loadTasksFromFirestore(); // Recargamos para ver los cambios
     });
 
-    // Evento: Doble clic para editar el texto
+    // NUEVO: Doble clic para editar (actualiza en la nube)
     taskTextSpan.addEventListener("dblclick", function () {
       const originalText = taskTextSpan.textContent;
       const editInput = document.createElement("input");
       editInput.type = "text";
       editInput.value = originalText;
       editInput.classList.add("task-edit-input");
-
       listItem.replaceChild(editInput, taskTextSpan);
       editInput.focus();
       editInput.select();
 
-      // Función interna para cerrar la edición
-      function finishEdit(saveChanges) {
+      async function finishEdit(saveChanges) {
         let newText = editInput.value.trim();
-        if (!saveChanges || newText === "") newText = originalText;
+        if (!saveChanges || newText === "") {
+          newText = originalText;
+        } else if (newText !== originalText) {
+          const taskDocRef = doc(window.db, "tareas", task.id);
+          await updateDoc(taskDocRef, { text: newText });
+        }
         taskTextSpan.textContent = newText;
         listItem.replaceChild(taskTextSpan, editInput);
-        saveTasks();
       }
-
+      
       editInput.addEventListener("keydown", e => {
         if (e.key === "Enter") finishEdit(true);
         else if (e.key === "Escape") finishEdit(false);
@@ -105,109 +96,135 @@ document.addEventListener("DOMContentLoaded", function () {
       editInput.addEventListener("blur", () => finishEdit(true));
     });
 
-    // Botón de borrar tarea
     const deleteButton = document.createElement("button");
     deleteButton.textContent = "Eliminar";
     deleteButton.classList.add("delete-button");
-    deleteButton.addEventListener("click", function () {
-      taskList.removeChild(listItem);
-      saveTasks();
-      updateFilterCounts();
+    // NUEVO: Clic para borrar de la nube
+    deleteButton.addEventListener("click", async function () {
+      await deleteDoc(doc(window.db, "tareas", task.id));
+      loadTasksFromFirestore();
     });
 
-    // --- Lógica de Drag & Drop (Inicio) ---
+    // --- El Drag & Drop se queda igual que antes ---
     listItem.addEventListener("dragstart", function (e) {
       draggedItem = listItem;
       listItem.classList.add("dragging");
-      const items = taskList.querySelectorAll(".task-item:not(.task-placeholder)");
-      dragInitialIndex = Array.from(items).indexOf(listItem);
-      if (e.dataTransfer) e.dataTransfer.effectAllowed = "move";
+      const items = Array.from(taskList.querySelectorAll(".task-item:not(.task-placeholder)"));
+      dragInitialIndex = items.indexOf(listItem);
     });
-
-    // --- Lógica de Drag & Drop (Fin) ---
     listItem.addEventListener("dragend", function () {
       listItem.classList.remove("dragging");
       if (dragPlaceholder && dragPlaceholder.parentNode) {
-        dragPlaceholder.parentNode.removeChild(dragPlaceholder);
+          dragPlaceholder.parentNode.removeChild(dragPlaceholder);
       }
-      dragPlaceholder = null; draggedItem = null; dragInitialIndex = null;
+      dragPlaceholder = null; draggedItem = null;
     });
-
-    // --- Lógica de Drag & Drop (Movimiento) ---
     listItem.addEventListener("dragover", function (e) {
       e.preventDefault();
       if (!draggedItem || draggedItem === listItem || listItem.classList.contains("task-placeholder")) return;
-
-      const items = taskList.querySelectorAll(".task-item:not(.task-placeholder)");
-      const currentIndex = Array.from(items).indexOf(listItem);
+      
       const rect = listItem.getBoundingClientRect();
-      const dropIndex = (e.clientY - rect.top) < (rect.height / 2) ? currentIndex : currentIndex + 1;
-
-      if (dropIndex === dragInitialIndex || (dropIndex === dragInitialIndex + 1 && (e.clientY - rect.top) < (rect.height / 2))) {
-        if (dragPlaceholder && dragPlaceholder.parentNode) {
-          dragPlaceholder.parentNode.removeChild(dragPlaceholder);
-          dragPlaceholder = null;
-        }
-        return;
-      }
+      const afterElement = e.clientY > rect.top + rect.height / 2 ? listItem.nextSibling : listItem;
 
       if (!dragPlaceholder) {
-        dragPlaceholder = document.createElement("li");
-        dragPlaceholder.classList.add("task-item", "task-placeholder");
+          dragPlaceholder = document.createElement("li");
+          dragPlaceholder.classList.add("task-item", "task-placeholder");
       }
-      
-      const insertBefore = items[dropIndex];
-      if (insertBefore) taskList.insertBefore(dragPlaceholder, insertBefore);
-      else taskList.appendChild(dragPlaceholder);
+      taskList.insertBefore(dragPlaceholder, afterElement);
     });
 
     listItem.appendChild(taskTextSpan);
     listItem.appendChild(deleteButton);
-    return listItem;
+    taskList.appendChild(listItem);
   }
 
-  // Función para añadir una nueva tarea desde el input
-  function addTask() {
+  // --- FUNCIONES DE CONTROL ---
+
+  // NUEVO: Añadir una tarea a la nube
+  async function addTask() {
     const text = taskInput.value.trim();
     if (text === "") return;
-    taskList.appendChild(createTaskElement(text, false));
-    saveTasks();
-    updateFilterCounts();
+
+    const newTask = {
+      text: text,
+      completed: false,
+      userId: usuarioActualId,
+      createdAt: new Date() // Usamos la fecha para ordenar
+    };
+
+    try {
+      await addDoc(collection(window.db, "tareas"), newTask);
+      loadTasksFromFirestore();
+    } catch (e) {
+      console.error("Error al añadir tarea:", e);
+      alert("No se pudo guardar la tarea.");
+    }
+
     taskInput.value = "";
     taskInput.focus();
   }
 
-  // Eventos principales del formulario de tareas
+  // Los filtros ahora no guardan en localStorage, solo cambian la vista
+  function applyFilter(filterValue) {
+    taskList.className = "filter-" + filterValue;
+    filterButtons.forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.filter === filterValue);
+    });
+  }
+
+  // El contador de tareas no necesita cambios
+  function updateFilterCounts() {
+      const items = taskList.querySelectorAll(".task-item:not(.task-placeholder)");
+      let pendingCount = 0, completedCount = 0;
+      
+      items.forEach(item => {
+          if (item.classList.contains("task-item--completed")) completedCount++;
+          else pendingCount++;
+      });
+
+      filterButtons.forEach(btn => {
+          const filter = btn.dataset.filter;
+          if (filter === "all") btn.textContent = `Todas (${items.length})`;
+          else if (filter === "pending") btn.textContent = `Pendientes (${pendingCount})`;
+          else if (filter === "completed") btn.textContent = `Completadas (${completedCount})`;
+      });
+  }
+
+  // --- EVENTOS Y CARGA INICIAL ---
+
   addButton.addEventListener("click", addTask);
   taskInput.addEventListener("keydown", e => { if (e.key === "Enter") addTask(); });
 
-  // Eventos de los filtros
   filterButtons.forEach(btn => {
-    btn.addEventListener("click", () => applyFilter(btn.getAttribute("data-filter")));
+    btn.addEventListener("click", () => applyFilter(btn.dataset.filter));
   });
 
-  // Evento de soltar (drop) del Drag & Drop
-  taskList.addEventListener("drop", function (e) {
+  // NUEVO: Reordenar en la nube al soltar una tarea
+  taskList.addEventListener("drop", async function (e) {
     e.preventDefault();
     if (!draggedItem || !dragPlaceholder) return;
+    
+    const draggedId = draggedItem.dataset.id;
     taskList.insertBefore(draggedItem, dragPlaceholder);
     dragPlaceholder.parentNode.removeChild(dragPlaceholder);
-    dragPlaceholder = null;
+    
+    const allTasks = Array.from(taskList.querySelectorAll(".task-item"));
+    for(let i = 0; i < allTasks.length; i++){
+        const taskDocRef = doc(window.db, "tareas", allTasks[i].dataset.id);
+        // Actualizamos su 'createdAt' para que coincida con el nuevo orden
+        await updateDoc(taskDocRef, { createdAt: new Date(Date.now() + i) }); 
+    }
+    
     draggedItem.classList.remove("dragging");
     draggedItem = null;
-    saveTasks();
-    updateFilterCounts();
+    // No hace falta recargar, el orden visual ya es correcto.
   });
 
-  taskList.addEventListener("dragover", e => {
-    if (draggedItem && dragPlaceholder) e.preventDefault();
-  });
+  taskList.addEventListener("dragover", e => { if (draggedItem) e.preventDefault(); });
 
-  // --- Inicialización al cargar la página ---
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (saved) {
-    JSON.parse(saved).forEach(task => taskList.appendChild(createTaskElement(task.text, task.completed)));
-  }
-  updateFilterCounts();
-  applyFilter(localStorage.getItem(FILTER_STORAGE_KEY) || "all");
+  // NUEVO: Cargamos las tareas solo cuando el usuario se ha logueado
+  window.addEventListener('usuarioLogueado', () => {
+      usuarioActualId = window.currentUser;
+      loadTasksFromFirestore();
+  });
 });

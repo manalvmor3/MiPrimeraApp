@@ -1,49 +1,61 @@
-// notas.js - Lógica exclusiva de Notas
+// notas.js - Lógica exclusiva de Notas CONECTADA A FIRESTORE
+
+// NUEVO: Importamos las funciones necesarias de Firestore
+import { 
+  collection, 
+  addDoc, 
+  query, 
+  where, 
+  getDocs, 
+  deleteDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+
 document.addEventListener("DOMContentLoaded", function () {
-  // 1. Selección de elementos del DOM específicos para la sección de notas
+  // 1. Selección de elementos del DOM
   const noteTitleInput = document.getElementById("note-title");
   const noteContentInput = document.getElementById("note-content");
   const saveNoteButton = document.getElementById("save-note-button");
   const notesGrid = document.getElementById("notes-grid");
 
-  // Clave para guardar las notas en el LocalStorage
-  const NOTES_STORAGE_KEY = "mis_notas";
+  let misNotas = []; // Array que contendrá las notas del usuario actual
+  let usuarioActualId = null; // Guardará el ID del usuario logueado
 
-  // 2. Cargar notas desde el LocalStorage (o devolver array vacío si no hay nada)
-  function loadNotesFromLocalStorage() {
-    const saved = localStorage.getItem(NOTES_STORAGE_KEY);
-    if (!saved) {
-      return [];
-    }
-    try {
-      const parsed = JSON.parse(saved); // Convertimos el string JSON de vuelta a objeto JS
-      return Array.isArray(parsed) ? parsed : [];
-    } catch (e) {
-      return []; // Si hay error al leer, devolvemos array vacío
-    }
+  // --- NUEVO: FUNCIONES DE FIRESTORE ---
+
+  // 2. Cargar notas desde la nube (solo las del usuario actual)
+  async function loadNotesFromFirestore() {
+    if (!usuarioActualId) return; // Si no hay usuario, no hacemos nada
+
+    notesGrid.innerHTML = ""; // Limpiamos la vista
+    misNotas = []; // Vaciamos el array local
+
+    // Creamos una "pregunta" a la base de datos:
+    // "En la colección 'notas', dame todos los documentos donde el 'userId' sea igual al del usuario actual"
+    const q = query(collection(window.db, "notas"), where("userId", "==", usuarioActualId));
+    
+    const querySnapshot = await getDocs(q); // Ejecutamos la consulta
+    querySnapshot.forEach((doc) => {
+      const nota = { id: doc.id, ...doc.data() }; // Unimos el ID del documento con sus datos
+      misNotas.push(nota);
+      createNoteCard(nota); // Pintamos la tarjeta
+    });
   }
 
-  // 3. Persistencia: Convertir el array de objetos a JSON y guardar en LocalStorage
-  function saveNotesToLocalStorage(notes) {
-    localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notes));
-  }
-
-  // 4. Crear una tarjeta visual para una nota individual
-  function createNoteCard(note, notesGrid, notes, onChange) {
+  // 3. Crear una tarjeta de nota visual (simplificada)
+  function createNoteCard(note) {
     const card = document.createElement("div");
     card.classList.add("note-card");
 
-    // Título de la nota
     const titleEl = document.createElement("div");
     titleEl.classList.add("note-title");
     titleEl.textContent = note.title || "Sin título";
 
-    // Cuerpo de la nota
     const contentEl = document.createElement("div");
     contentEl.classList.add("note-content");
     contentEl.textContent = note.content || "";
 
-    // Botones de acción (Eliminar)
     const actionsEl = document.createElement("div");
     actionsEl.classList.add("note-actions");
 
@@ -51,13 +63,14 @@ document.addEventListener("DOMContentLoaded", function () {
     deleteBtn.classList.add("note-delete-button");
     deleteBtn.textContent = "Eliminar";
 
-    // Evento: Al hacer clic en eliminar, quitamos la nota del array y actualizamos la vista
-    deleteBtn.addEventListener("click", function () {
-      const index = notes.findIndex(function (n) { return n.id === note.id; });
-      if (index !== -1) {
-        notes.splice(index, 1);
-        saveNotesToLocalStorage(notes);
-        onChange(); // Callback para volver a pintar la lista
+    // NUEVO: Evento para borrar de Firestore
+    deleteBtn.addEventListener("click", async function () {
+      try {
+        await deleteDoc(doc(window.db, "notas", note.id));
+        loadNotesFromFirestore(); // Refrescamos la vista
+      } catch (error) {
+        console.error("Error al borrar la nota: ", error);
+        alert("No se pudo borrar la nota.");
       }
     });
 
@@ -69,46 +82,43 @@ document.addEventListener("DOMContentLoaded", function () {
     notesGrid.appendChild(card);
   }
 
-  // 5. Dibujar todas las notas en pantalla
-  function renderNotes(notesGrid, notes) {
-    notesGrid.innerHTML = ""; // Limpiamos la cuadrícula antes de repintar
-    notes.forEach(function (note) {
-      createNoteCard(note, notesGrid, notes, function () {
-        renderNotes(notesGrid, notes); // Función callback para refrescar la vista
-      });
-    });
-  }
+  // --- LÓGICA DE EVENTOS ---
 
-  // 6. Inicialización: Cargamos notas existentes al arrancar
-  let misNotas = loadNotesFromLocalStorage();
-  renderNotes(notesGrid, misNotas);
-
-  // 7. Evento para añadir una nota nueva
-  saveNoteButton.addEventListener("click", function () {
+  // 4. Evento para añadir una nota nueva
+  saveNoteButton.addEventListener("click", async function () {
     const title = noteTitleInput.value.trim();
     const content = noteContentInput.value.trim();
 
-    // Validación básica
     if (content === "") {
       alert("¡El contenido de la nota no puede estar vacío!");
       return;
     }
 
-    // Creamos el objeto de la nueva nota
+    // NUEVO: Preparamos el objeto para guardarlo en la nube
     const newNote = {
-      id: Date.now().toString(), // Usamos el timestamp como ID único
       title: title,
-      content: content
+      content: content,
+      userId: usuarioActualId, // ¡La etiqueta con el DNI del usuario!
+      createdAt: new Date() // Guardamos la fecha de creación
     };
 
-    // Añadimos al array, guardamos y repintamos
-    misNotas.push(newNote);
-    saveNotesToLocalStorage(misNotas);
-    renderNotes(notesGrid, misNotas);
+    try {
+      // NUEVO: Usamos addDoc para guardar la nota en la colección "notas"
+      await addDoc(collection(window.db, "notas"), newNote);
+      loadNotesFromFirestore(); // Recargamos las notas desde la nube
+    } catch (e) {
+      console.error("Error al añadir la nota: ", e);
+      alert("Hubo un error al guardar tu nota. Inténtalo de nuevo.");
+    }
 
-    // Limpiamos los campos de entrada
     noteTitleInput.value = "";
     noteContentInput.value = "";
-    noteTitleInput.focus(); // Devolvemos el foco al campo de título
+    noteTitleInput.focus();
+  });
+
+  // 5. Inicialización: Escuchamos el evento que lanza auth.js
+  window.addEventListener('usuarioLogueado', () => {
+      usuarioActualId = window.currentUser;
+      loadNotesFromFirestore(); // Cargamos las notas en cuanto entra el usuario
   });
 });
