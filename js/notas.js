@@ -1,6 +1,6 @@
 // notas.js - Lógica exclusiva de Notas CONECTADA A FIRESTORE
 
-// NUEVO: Importamos las funciones necesarias de Firestore
+// NUEVO: Importamos las funciones necesarias de Firestore (Añadimos updateDoc para editar)
 import { 
   collection, 
   addDoc, 
@@ -8,12 +8,13 @@ import {
   where, 
   getDocs, 
   deleteDoc,
-  doc
+  doc,
+  updateDoc
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 
 document.addEventListener("DOMContentLoaded", function () {
-  // 1. Selección de elementos del DOM
+  // 1. Selección de elementos del DOM específicos para la sección de notas
   const noteTitleInput = document.getElementById("note-title");
   const noteContentInput = document.getElementById("note-content");
   const saveNoteButton = document.getElementById("save-note-button");
@@ -43,10 +44,17 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // 3. Crear una tarjeta de nota visual (simplificada)
+  // 3. Crear una tarjeta de nota visual (Con soporte para edición)
   function createNoteCard(note) {
     const card = document.createElement("div");
     card.classList.add("note-card");
+
+    // --- VISTA DE LECTURA (Lo que se ve normalmente) ---
+    const readView = document.createElement("div");
+    readView.classList.add("note-read-view"); // Clase para control visual
+    readView.style.display = "flex";
+    readView.style.flexDirection = "column";
+    readView.style.height = "100%";
 
     const titleEl = document.createElement("div");
     titleEl.classList.add("note-title");
@@ -64,20 +72,91 @@ document.addEventListener("DOMContentLoaded", function () {
     deleteBtn.textContent = "Eliminar";
 
     // NUEVO: Evento para borrar de Firestore
-    deleteBtn.addEventListener("click", async function () {
-      try {
-        await deleteDoc(doc(window.db, "notas", note.id));
-        loadNotesFromFirestore(); // Refrescamos la vista
-      } catch (error) {
-        console.error("Error al borrar la nota: ", error);
-        alert("No se pudo borrar la nota.");
+    deleteBtn.addEventListener("click", async function (e) {
+      e.stopPropagation(); // Evita que el clic active el modo edición
+      if (confirm("¿Estás seguro de que quieres borrar esta nota?")) {
+        try {
+          await deleteDoc(doc(window.db, "notas", note.id));
+          loadNotesFromFirestore(); // Refrescamos la vista
+        } catch (error) {
+          console.error("Error al borrar la nota: ", error);
+          alert("No se pudo borrar la nota.");
+        }
       }
     });
 
+    // Montamos la vista de lectura
     actionsEl.appendChild(deleteBtn);
-    card.appendChild(titleEl);
-    card.appendChild(contentEl);
-    card.appendChild(actionsEl);
+    readView.appendChild(titleEl);
+    readView.appendChild(contentEl);
+    readView.appendChild(actionsEl);
+    card.appendChild(readView);
+
+    // --- NUEVO: LÓGICA DE EDICIÓN (Doble clic) ---
+    card.addEventListener("dblclick", function() {
+        // Ocultamos la vista de lectura
+        readView.classList.add("hidden");
+
+        // Creamos dinámicamente el formulario de edición
+        const editForm = document.createElement("div");
+        editForm.classList.add("note-edit-form");
+
+        const editTitle = document.createElement("input");
+        editTitle.classList.add("note-edit-input");
+        editTitle.value = note.title;
+
+        const editContent = document.createElement("textarea");
+        editContent.classList.add("note-edit-textarea");
+        editContent.value = note.content;
+
+        const editActions = document.createElement("div");
+        editActions.classList.add("note-edit-actions");
+
+        const saveBtn = document.createElement("button");
+        saveBtn.classList.add("note-save-btn");
+        saveBtn.textContent = "Guardar";
+
+        const cancelBtn = document.createElement("button");
+        cancelBtn.classList.add("note-cancel-btn");
+        cancelBtn.textContent = "Cancelar";
+
+        // Evento para GUARDAR cambios en Firestore
+        saveBtn.addEventListener("click", async function(e) {
+            e.stopPropagation();
+            const newTitle = editTitle.value.trim();
+            const newContent = editContent.value.trim();
+
+            if (newContent === "") return alert("El contenido no puede estar vacío.");
+
+            try {
+                const noteRef = doc(window.db, "notas", note.id);
+                await updateDoc(noteRef, {
+                    title: newTitle,
+                    content: newContent
+                });
+                loadNotesFromFirestore(); // Recargamos para ver los cambios
+            } catch (error) {
+                console.error("Error al actualizar: ", error);
+            }
+        });
+
+        // Evento para CANCELAR la edición
+        cancelBtn.addEventListener("click", function(e) {
+            e.stopPropagation();
+            editForm.remove(); // Borramos el formulario
+            readView.classList.remove("hidden"); // Volvemos a mostrar la nota
+        });
+
+        // Montamos el formulario de edición
+        editActions.appendChild(cancelBtn);
+        editActions.appendChild(saveBtn);
+        editForm.appendChild(editTitle);
+        editForm.appendChild(editContent);
+        editForm.appendChild(editActions);
+        card.appendChild(editForm);
+
+        editTitle.focus(); // Ponemos el foco en el título al empezar a editar
+    });
 
     notesGrid.appendChild(card);
   }

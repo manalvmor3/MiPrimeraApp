@@ -84,6 +84,70 @@
 }
 .note-delete-button:hover { background-color: #c62828; }
 
+/* --- NUEVO: ESTILOS PARA EL MODO EDICIÓN DE NOTAS --- */
+
+/* Contenedor de la vista de edición */
+.note-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+}
+
+/* Campos de texto durante la edición */
+.note-edit-input,
+.note-edit-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #ffb300; /* Borde amarillo para indicar edición */
+  border-radius: 6px;
+  padding: 6px 8px;
+  background-color: #fffde7;
+  font-family: inherit;
+}
+.note-edit-input {
+  font-weight: 600;
+}
+.note-edit-textarea {
+  flex: 1; /* Ocupa todo el espacio vertical disponible */
+  resize: none; /* No permitimos que el usuario lo redimensione */
+}
+
+/* Botones de Guardar/Cancelar */
+.note-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.note-save-btn,
+.note-cancel-btn {
+  border: none;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.note-save-btn {
+  background-color: #4caf50;
+  color: white;
+}
+.note-save-btn:hover {
+  background-color: #43a047;
+}
+
+.note-cancel-btn {
+  background-color: #f0f0f0;
+  color: #333;
+}
+.note-cancel-btn:hover {
+  background-color: #e0e0e0;
+}
+
 /* ===== MODO OSCURO (Notas) ===== */
 /* Ajustamos los colores para que no deslumbren en modo oscuro */
 body.dark-mode #note-title,

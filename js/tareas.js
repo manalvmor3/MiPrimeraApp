@@ -119,18 +119,39 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       dragPlaceholder = null; draggedItem = null;
     });
+    
+    // --- Lógica de Drag & Drop (Movimiento) ---
     listItem.addEventListener("dragover", function (e) {
       e.preventDefault();
-      if (!draggedItem || draggedItem === listItem || listItem.classList.contains("task-placeholder")) return;
       
-      const rect = listItem.getBoundingClientRect();
-      const afterElement = e.clientY > rect.top + rect.height / 2 ? listItem.nextSibling : listItem;
+      // Ignoramos si no estamos arrastrando, si estamos sobre nosotros mismos, o sobre el placeholder
+      if (!draggedItem || draggedItem === listItem || listItem.classList.contains("task-placeholder")) return;
 
-      if (!dragPlaceholder) {
-          dragPlaceholder = document.createElement("li");
-          dragPlaceholder.classList.add("task-item", "task-placeholder");
+      const rect = listItem.getBoundingClientRect();
+      const isAfter = e.clientY > rect.top + rect.height / 2;
+      
+      // Calculamos dónde iría el placeholder (delante de la tarea actual o de la siguiente)
+      const referenceElement = isAfter ? listItem.nextSibling : listItem;
+
+      // --- EL TRUCO MÁGICO ---
+      // Comprobamos si la posición calculada es exactamente el "hueco original" de la tarea.
+      // Si el elemento de referencia es la propia tarea que arrastramos, o su hermana directa...
+      if (referenceElement === draggedItem || referenceElement === draggedItem.nextSibling) {
+          // ...significa que no hemos cambiado de posición. Borramos el placeholder si existía.
+          if (dragPlaceholder && dragPlaceholder.parentNode) {
+              dragPlaceholder.parentNode.removeChild(dragPlaceholder);
+              dragPlaceholder = null;
+          }
+          return; // Cortamos la función aquí, no mostramos el borde punteado.
       }
-      taskList.insertBefore(dragPlaceholder, afterElement);
+
+      // Si es una posición verdaderamente nueva, creamos y posicionamos el placeholder
+      if (!dragPlaceholder) {
+        dragPlaceholder = document.createElement("li");
+        dragPlaceholder.classList.add("task-item", "task-placeholder");
+      }
+      
+      taskList.insertBefore(dragPlaceholder, referenceElement);
     });
 
     listItem.appendChild(taskTextSpan);
