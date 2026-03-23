@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Mi Lista de Tareas</title>
+  <meta name="description" content="Mi aplicación personal para gestionar tareas y notas en la nube." />
   
   <!-- Enlazamos los archivos CSS por separado para mantener el orden.
        El orden aquí es importante: los estilos específicos (tareas/notas) 
@@ -11,6 +12,11 @@
   <link rel="stylesheet" href="css/auth.css" /> <!-- NUEVO: Estilos del login -->
   <link rel="stylesheet" href="css/tareas.css" />
   <link rel="stylesheet" href="css/notas.css" />
+
+  <!-- Enlaces PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#4caf50" />
+
 </head>
 
 <body>
@@ -69,7 +75,7 @@
     </nav>
 
       <!-- APP PRINCIPAL (Ahora oculta por defecto con la clase 'hidden' y un ID nuevo) -->
-      <div id="main-app-view" class="app-container hidden">
+    <main id="main-app-view" class="app-container hidden">
       
       <!-- VISTA DE TAREAS: Esta sección se muestra por defecto.
            Contiene el input de texto, el botón de añadir y los botones de filtro. -->
@@ -108,7 +114,7 @@
           <!-- Las tarjetas de notas se generan aquí -->
         </div>
       </div>
-    </div>
+    </main>
 
   <!-- Scripts: Cargamos los archivos JS al final para asegurar que 
        el navegador ya ha dibujado todo el HTML antes de empezar a manipularlo. -->

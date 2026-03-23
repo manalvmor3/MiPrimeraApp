@@ -21,13 +21,13 @@
   padding: 10px 16px; 
   border: none; 
   border-radius: 8px;
-  background-color: #4caf50; 
+  background-color: #2e7d32; 
   color: white; 
   font-size: 14px; 
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
-#add-button:hover { background-color: #43a047; }
+#add-button:hover { background-color: #1b5e20; }
 
 /* Barra de filtros (Todas, Pendientes, Completadas) */
 .filter-bar { display: flex; gap: 6px; margin-bottom: 16px; }
@@ -47,8 +47,8 @@
 
 /* Estado activo del filtro (botón resaltado) */
 .filter-btn.active { 
-  background-color: #4caf50; 
-  border-color: #4caf50; 
+  background-color: #2e7d32; 
+  border-color: #2e7d32; 
   color: white; 
 }
 
@@ -83,7 +83,7 @@
 .task-text { flex: 1; margin-right: 8px; font-size: 14px; color: #333333; cursor: pointer; }
 
 /* Tarea completada: añadimos tachado */
-.task-text.completed { text-decoration: line-through; color: #888888; }
+.task-text.completed { text-decoration: line-through; color: #555555; }
 
 /* Input temporal que aparece al hacer doble clic para editar */
 .task-edit-input {
@@ -93,10 +93,10 @@
 
 /* Botón de eliminar tarea */
 .delete-button {
-  background-color: #e53935; color: white; border: none; border-radius: 6px;
+  background-color: #c62828; color: white; border: none; border-radius: 6px;
   padding: 6px 10px; font-size: 12px; cursor: pointer; transition: background-color 0.2s ease;
 }
-.delete-button:hover { background-color: #c62828; }
+.delete-button:hover { background-color: #b71c1c; }
 
 /* Lógica de filtrado: Ocultamos elementos usando selectores CSS avanzados 
    según la clase que JavaScript añade al padre (#task-list) */

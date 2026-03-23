@@ -78,11 +78,11 @@
   border-radius: 6px; 
   padding: 4px 8px; 
   font-size: 12px;
-  background-color: #e53935; /* Rojo de peligro */
+  background-color: #c62828; /* Rojo de peligro */
   color: white; 
   cursor: pointer;
 }
-.note-delete-button:hover { background-color: #c62828; }
+.note-delete-button:hover { background-color: #b71c1c; }
 
 /* --- NUEVO: ESTILOS PARA EL MODO EDICIÓN DE NOTAS --- */
 
