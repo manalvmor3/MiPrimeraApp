@@ -61,16 +61,16 @@ document.addEventListener("DOMContentLoaded", function () {
   showView("tareas"); // Por defecto empezamos siempre en la vista de Tareas
 
   // --- REGISTRO DEL SERVICE WORKER (Para PWA) ---
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(registration => {
-          console.log('ServiceWorker registrado con éxito:', registration.scope);
-        })
-        .catch(error => {
-          console.log('Error al registrar el ServiceWorker:', error);
-        });
-    });
-  }
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(registration => {
+            console.log('ServiceWorker registrado con éxito:', registration.scope);
+          })
+          .catch(error => {
+            console.log('Error al registrar el ServiceWorker:', error);
+          });
+      });
+    }
 
 });
