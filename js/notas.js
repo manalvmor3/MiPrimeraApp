@@ -5,6 +5,9 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", function () {
+  const NOTAS_COLLECTION = "notas";
+  const USER_ID_FIELD = "userId";
+
   const noteTitleInput = document.getElementById("note-title");
   const noteContentInput = document.getElementById("note-content");
   const saveNoteButton = document.getElementById("save-note-button");
@@ -16,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
   async function loadNotesFromFirestore() {
     if (!usuarioActualId) return;
     notesGrid.innerHTML = ""; 
-    const q = query(collection(window.db, "notas"), where("userId", "==", usuarioActualId));
+    const q = query(collection(window.db, NOTAS_COLLECTION), where(USER_ID_FIELD, "==", usuarioActualId));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => createNoteCard({ id: doc.id, ...doc.data() }));
   }
@@ -48,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
       e.stopPropagation();
       if (confirm("¿Borrar nota?")) {
         card.remove(); // <--- ELIMINACIÓN QUIRÚRGICA (Sin parpadeo)
-        await deleteDoc(doc(window.db, "notas", note.id));
+        await deleteDoc(doc(window.db, NOTAS_COLLECTION, note.id));
       }
     });
 
@@ -84,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
         editForm.remove();
         readView.classList.remove("hidden");
 
-        await updateDoc(doc(window.db, "notas", note.id), { title: newT, content: newC });
+        await updateDoc(doc(window.db, NOTAS_COLLECTION, note.id), { title: newT, content: newC });
       });
 
       editForm.querySelector(".note-cancel-btn").addEventListener("click", (e) => {
@@ -103,10 +106,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const content = noteContentInput.value.trim();
     if (content === "") return;
 
-    const newNote = { title, content, userId: usuarioActualId, createdAt: new Date() };
+    const newNote = { title, content, [USER_ID_FIELD]: usuarioActualId, createdAt: new Date() };
     noteTitleInput.value = ""; noteContentInput.value = "";
 
-    const docRef = await addDoc(collection(window.db, "notas"), newNote);
+    const docRef = await addDoc(collection(window.db, NOTAS_COLLECTION), newNote);
     createNoteCard({ id: docRef.id, ...newNote }); // <--- INSERCIÓN QUIRÚRGICA (Sin parpadeo)
   });
 
