@@ -1,7 +1,7 @@
 // tareas.js - Lógica exclusiva de Tareas (ACTUALIZACIONES QUIRÚRGICAS Y DRAG & DROP)
 
 import { 
-  collection, addDoc, query, where, getDocs, deleteDoc, doc, updateDoc, orderBy 
+  collection, addDoc, query, where, getDocs, deleteDoc, doc, updateDoc, orderBy, writeBatch
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -242,13 +242,17 @@ document.addEventListener("DOMContentLoaded", function () {
     dragPlaceholder = null;
     draggedItem = null;
 
-    // 2. Sincronizamos el nuevo orden en Firebase actualizando el 'createdAt'
+    // 2. Sincronizamos el nuevo orden en Firebase actualizando el 'createdAt' en un solo lote (batch)
     const tasks = Array.from(taskList.querySelectorAll(".task-item"));
     try {
+      const batch = writeBatch(window.db);
       for(let i = 0; i < tasks.length; i++){
-          // Actualizamos la base de datos de fondo, sin bloquear la pantalla
-          updateDoc(doc(window.db, "tareas", tasks[i].dataset.id), { createdAt: new Date(Date.now() + i) });
+          // Preparamos la actualización de cada documento en el lote
+          const taskRef = doc(window.db, "tareas", tasks[i].dataset.id);
+          batch.update(taskRef, { createdAt: new Date(Date.now() + i) });
       }
+      // Enviamos todas las actualizaciones en una sola petición atómica
+      await batch.commit();
     } catch (error) {
       console.error("Error al reordenar:", error);
     }
